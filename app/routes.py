@@ -1,11 +1,11 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from urllib.parse import urlsplit
 import sqlalchemy as sa
-# import requests
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from app.models import User
+from app.open_library import BookSearch
 
 
 @app.route('/')
@@ -51,19 +51,29 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash("Congragulation! You're now registered")
+        flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
 
-# @app.route('/books', methods=['GET'])
-# def get_title():
-#     api_url = 'https://openlibrary.org/works/OL45804W.json'
-#     res = requests.get(api_url)
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    books = []
+    query = request.args.get('q', '')
 
-#     if res.status_code == 200:
-#         data = res.json()
-#         title = data.get('title', 'title not found')
-#         return render_template('book.html', title=title, description=data.get('description', 'No desc found!'))
-#     else:
-#         return f'error{res.status_code}! failed to fetch data'
+    if query:
+        book_search = BookSearch()
+        result = book_search.get_by_title(query)
+        books = result.docs
+
+    return render_template('search.html', books=books, query=query)
+
+    #     url = f"https://openlibrary.org/search/inside.json?q={query}"
+    #     response = requests.get(url)
+    #     if response.status_code == 200:
+    #         data = response.json()
+    #         return jsonify(data)
+    #     else:
+    #         return jsonify({"error": "Failed to fetch data from OpenLibrary"}), 500
+    # else:
+    #     return jsonify({"error": "No search query provided"}), 400

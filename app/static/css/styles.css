@@ -1,3 +1,28 @@
-t {
-  color: red;
+html, body {
+  height: 100%;
+}
+
+
+
+.center-container {
+  display: flex;
+  flex-direction: column;  /* Stack input and button vertically */
+  justify-content: center; /* Center vertically */
+  align-items: center;     /* Center horizontally */
+  height: 100vh;           /* Full height of the viewport */
+  text-align: center;      /* Optional: Center text inside elements */
+}
+
+#booksearch, #search-button {
+  padding: 10px;
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Optional: Add some hover effects */
+#search-button:hover {
+  background-color: #007bff;
+  color: white;
 }

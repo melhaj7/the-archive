@@ -42,6 +42,9 @@
             <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
           </li>
           {% endif %}
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('search') }}">Search</a>
+          </li>
       </div>
     </nav>
     {% with messages = get_flashed_messages() %}
@@ -54,13 +57,6 @@
     {% endif %}
     {% endwith %}
     {% block content %} {% endblock %}
-    <!--search bar-->
-    <!-- <div class="t">
-        <form method="GET" action="/search">
-            <input class="form-control form-control-lg" type="text" name="query" placeholder="Search for a book">
-            <button type="submit" class="btn btn-secondary btn-lg">Search</button>
-        </form>        
-    </div> -->
 
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
@@ -77,5 +73,6 @@
       integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
       crossorigin="anonymous"
     ></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   </body>
 </html>

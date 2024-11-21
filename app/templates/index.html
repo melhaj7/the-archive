@@ -1,3 +1,15 @@
 {% extends 'base.html' %} {% block content %}
-<h1>This is the home page!</h1>
+<div class="center-container">
+  <form action="">
+    <input
+      type="text"
+      name="q"
+      id="booksearch"
+      placeholder="Search for book or author"
+      value="{{ query or '' }}"
+    />
+    <button type="submit" class="btn" id="search-button">Search</button>
+  </form>
+</div>
+<div id="search-results"></div>
 {% endblock %}
