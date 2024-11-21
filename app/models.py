@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 import sqlalchemy as sa
 import sqlalchemy.orm as so
+from sqlalchemy.types import Boolean
 
 from app import db, login
 
@@ -14,7 +15,7 @@ class User(UserMixin, db.Model):
     email: so.Mapped[str] = so.mapped_column(
         sa.String(120), index=True, unique=True)
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
-    role: so.Mapped[str] = so.mapped_column(sa.String(50))
+    is_admin: so.Mapped[bool] = so.mapped_column(Boolean, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
