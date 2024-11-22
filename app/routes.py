@@ -1,11 +1,11 @@
-from flask import render_template, flash, redirect, url_for, request, jsonify
-from flask_login import current_user, login_user, logout_user, login_required
 from urllib.parse import urlsplit
+from flask import render_template, flash, redirect, url_for, request
+from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from app.models import User
-from app.open_library import BookSearch
+from app.google_books import Gbooks
 
 
 @app.route('/')
@@ -58,22 +58,23 @@ def register():
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    books = []
     query = request.args.get('q', '')
+    page_action = request.args.get('action', None)
+    gbooks = Gbooks()
+    titles, authors = [], []
+    total_items = 0
 
     if query:
-        book_search = BookSearch()
-        result = book_search.get_by_title(query)
-        books = result.docs
+        if page_action == 'next':
+            gbooks.next_page()
+        elif page_action == 'previous':
+            gbooks.previous_page()
 
-    return render_template('search.html', books=books, query=query)
+        titles, authors, total_items = gbooks.search(query)
 
-    #     url = f"https://openlibrary.org/search/inside.json?q={query}"
-    #     response = requests.get(url)
-    #     if response.status_code == 200:
-    #         data = response.json()
-    #         return jsonify(data)
-    #     else:
-    #         return jsonify({"error": "Failed to fetch data from OpenLibrary"}), 500
-    # else:
-    #     return jsonify({"error": "No search query provided"}), 400
+    current_page = (gbooks.start_page_index / gbooks.results_per_page) + 1
+    total_pages = (
+        total_items + gbooks.results_per_page) // gbooks.results_per_page
+
+    return render_template('search.html', titles=titles, authors=authors,
+                           total_items=total_items, current_page=current_page, total_pages=total_pages, query=query)
