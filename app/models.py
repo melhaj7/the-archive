@@ -27,6 +27,15 @@ class User(UserMixin, db.Model):
         return f'User: {self.username}'
 
 
+class Book(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    title: so.Mapped[str] = so.mapped_column(sa.String(255), index=True)
+    author: so.Mapped[str] = so.mapped_column(sa.String(120), index=True)
+    publication_year: so.Mapped[int] = so.mapped_column()
+    status: so.Mapped[str] = so.mapped_column(
+        sa.String(120), nullable=False, default='available')
+
+
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))
