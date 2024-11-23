@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import HiddenField, IntegerField, StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, Email, ValidationError
 import sqlalchemy as sa
 from app import db
@@ -32,3 +32,15 @@ class RegistrationForm(FlaskForm):
             User.email == email.data))
         if user is not None:
             raise ValidationError('Please use a different email address.')
+
+
+class AddBook(FlaskForm):
+    id_field = HiddenField()
+    title = StringField('Book title', validators=[DataRequired()])
+    author = StringField('Author Name', validators=[DataRequired()])
+    publication_year = IntegerField(
+        'Publication Year', validators=[DataRequired()])
+
+    # updated - date - handled in the route function
+    updated = HiddenField()
+    submit = SubmitField('Add/Update Record')

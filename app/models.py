@@ -35,6 +35,61 @@ class Book(db.Model):
     status: so.Mapped[str] = so.mapped_column(
         sa.String(120), nullable=False, default='available')
 
+    @classmethod
+    def get_all_books(cls):
+        return cls.query.all()
+
+    @classmethod
+    def get_book_by_id(cls, book_id):
+        return cls.query.get(book_id)
+
+    @classmethod
+    def add_book(cls, title, author, publication_year):
+        book = cls(
+            title=title,
+            author=author,
+            publication_year=publication_year
+        )
+        db.session.add(book)
+        db.session.commit()
+        return book
+
+    @classmethod
+    def update_book(cls, book_id, title=None, author=None, publication_year=None):
+        book = cls.query.get(book_id)
+
+        if not book:
+            return {'error': 'Book not found'}
+
+        is_updated = False
+        if title:
+            book.title = title
+            is_updated = True
+        if author:
+            book.author = author
+            is_updated = True
+        if publication_year:
+            book.publication_year = publication_year
+            is_updated = True
+
+        if is_updated:
+            db.session.commit()
+            return {'success': 'Changes applied successfully',
+                    'book': {'id': book_id, 'title': title,
+                             'author': author, 'publication_year': publication_year}}
+        else:
+            return {'error': 'No changes made'}
+
+    @classmethod
+    def delete_book(cls, book_id):
+        book = cls.query.get(book_id)
+        if book:
+            db.session.delete(book)
+            db.session.commit()
+            return {'success': 'Book deleted successfully'}
+        else:
+            return {'error': 'Book not found'}
+
 
 @login.user_loader
 def load_user(id):

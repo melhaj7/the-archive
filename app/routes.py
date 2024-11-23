@@ -1,10 +1,11 @@
+import json
 from urllib.parse import urlsplit
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from app import app, db
-from app.forms import LoginForm, RegistrationForm
-from app.models import User
+from app.forms import LoginForm, RegistrationForm, AddBook
+from app.models import User, Book
 from app.google_books import Gbooks
 
 
@@ -78,3 +79,22 @@ def search():
 
     return render_template('search.html', titles=titles, authors=authors,
                            total_items=total_items, current_page=current_page, total_pages=total_pages, query=query)
+
+
+@app.route('/books', methods=['GET'])
+def get_books():
+    books = Book.get_all_books()
+    return jsonify([json.dumps(book) for book in books])
+
+
+@app.route('/add_book', methods=['POST'])
+def add_book():
+    form = AddBook()
+    if form.validate_on_submit():
+        book = Book.add_book(title=form.title.data, author=form.author.data,
+                             publication_year=form.publication_year.data)
+        db.session.add(book)
+        db.session.commit()
+        flash('Book has been added!')
+        return redirect(url_for('get_books'))
+    return render_template('add_book.html', title='Books List', form=form)
